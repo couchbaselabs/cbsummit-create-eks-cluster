@@ -1,0 +1,4 @@
+aws-auth-cm.yaml
+aws-auth-patch.yaml
+notes.txt
+*.pyc
