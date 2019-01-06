@@ -179,7 +179,14 @@ parameters.EKS_NODE_VOLUME_SIZE
 		execute_command("kubectl apply -f aws-auth-cm.yaml", False)
 		step=step+1
 
-	if step == 6 and len(parameters.AWS_SECOND_USER_ARN) > 3 and len(parameters.AWS_SECOND_USER_NAME) >= 1:
+	try:
+		AWS_SEC_ARN=parameters.AWS_SECOND_USER_ARN
+		AWS_SEC_NAME=parameters.AWS_SECOND_USER_NAME
+	except AttributeError:
+		AWS_SEC_ARN=""
+		AWS_SEC_NAME=""
+
+	if step == 6 and len(AWS_SEC_ARN) > 3 and len(AWS_SEC_NAME) >= 1:
 		execute_command("kubectl get -n kube-system configmap/aws-auth -o yaml > aws-auth-patch.yaml", False)
 		insert_lines("./aws-auth-patch.yaml", "kind: ConfigMap",["  mapUsers: |","    - userarn: {}".format(parameters.AWS_SECOND_USER_ARN), \
 				"      username: {}".format(parameters.AWS_SECOND_USER_NAME), \
