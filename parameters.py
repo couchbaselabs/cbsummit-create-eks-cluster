@@ -36,5 +36,5 @@ EKS_NODE_VOLUME_SIZE="20"
 #===============================
 #	Secondary User
 #===============================
-AWS_SECOND_USER_ARN=""
-AWS_SECOND_USER_NAME=""
+AWS_SECOND_USER_ARN="arn:aws:iam::669678783832:user/cb-day-participant"
+AWS_SECOND_USER_NAME="cb-day-participant"
