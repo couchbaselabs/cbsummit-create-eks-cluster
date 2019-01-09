@@ -11,7 +11,7 @@ VPC_TEMPLATE="https://amazon-eks.s3-us-west-2.amazonaws.com/cloudformation/2018-
 #	EKS Cluster
 #===============================
 EKS_CLUSTER_NAME="cktestcluster"
-EKS_ROLE_ARN="arn:aws:iam::486708402843:role/ck-eks-cbd-review"
+EKS_ROLE_ARN="arn:aws:iam::669678783832:role/cbd-eks-role"
 
 #===============================
 #	EKS Worker Nodes
@@ -29,12 +29,12 @@ EKS_NODE_INSTANCE_TYPE="m4.4xlarge"
 EKS_IMAGE_ID="ami-053cbe66e0033ebcf"
 
 #The IAM Key to use
-EKS_KEY_NAME="couchbase-ckovar"
+EKS_KEY_NAME="cb-day-se"
 
 EKS_NODE_VOLUME_SIZE="20"
 
 #===============================
 #	Secondary User
 #===============================
-AWS_SECOND_USER_ARN="arn:aws:iam::486708402843:user/cbd_user"
-AWS_SECOND_USER_NAME="cbd_user"
+AWS_SECOND_USER_ARN=""
+AWS_SECOND_USER_NAME=""
