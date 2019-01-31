@@ -144,6 +144,12 @@ def install_eks():
 		step=step+1
 
 	if step == 3:
+
+		#Check Desired vs Min and Max
+		if parameters.EKS_NODE_AS_GROUP_DESIRED < parameters.EKS_NODE_AS_GROUP_MIN or \
+			parameters.EKS_NODE_AS_GROUP_DESIRED > parameters.EKS_NODE_AS_GROUP_MAX:
+			onError("Autoscaling Group Desired size outside Min/Max",1)
+
 		#Build Worker Node Command
 		command="aws cloudformation create-stack --stack-name {0} --template-url {1} --parameters \
 ParameterKey=ClusterName,ParameterValue={2} ParameterKey=ClusterControlPlaneSecurityGroup,ParameterValue={3} \
@@ -151,13 +157,14 @@ ParameterKey=NodeGroupName,ParameterValue={4} ParameterKey=NodeAutoScalingGroupM
 ParameterKey=NodeAutoScalingGroupMaxSize,ParameterValue={6} ParameterKey=NodeInstanceType,ParameterValue={7} \
 ParameterKey=NodeImageId,ParameterValue={8} ParameterKey=KeyName,ParameterValue={9} \
 ParameterKey=VpcId,ParameterValue={10} ParameterKey=Subnets,ParameterValue=\'{11}\' \
-ParameterKey=NodeVolumeSize,ParameterValue={12} --capabilities CAPABILITY_IAM".format(parameters.EKS_NODES_STACK_NAME, parameters.EKS_NODES_TEMPLATE, 
+ParameterKey=NodeVolumeSize,ParameterValue={12} ParameterKey=NodeAutoScalingGroupDesiredCapacity,ParameterValue={13} \
+ --capabilities CAPABILITY_IAM".format(parameters.EKS_NODES_STACK_NAME, parameters.EKS_NODES_TEMPLATE, 
 parameters.EKS_CLUSTER_NAME, aws_values["SecurityGroups"],
 parameters.EKS_NODE_GROUP_NAME, parameters.EKS_NODE_AS_GROUP_MIN,
 parameters.EKS_NODE_AS_GROUP_MAX, parameters.EKS_NODE_INSTANCE_TYPE,
 parameters.EKS_IMAGE_ID, parameters.EKS_KEY_NAME,
 aws_values["VpcId"], aws_values["SubnetIds"].replace(",","\,"),
-parameters.EKS_NODE_VOLUME_SIZE
+parameters.EKS_NODE_VOLUME_SIZE, parameters.EKS_NODE_AS_GROUP_DESIRED
 )
 
 		#execute command

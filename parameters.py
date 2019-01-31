@@ -19,8 +19,9 @@ EKS_ROLE_ARN="arn:aws:iam::669678783832:role/cbd-eks-role"
 EKS_NODES_TEMPLATE="https://amazon-eks.s3-us-west-2.amazonaws.com/cloudformation/2018-12-10/amazon-eks-nodegroup.yaml"
 EKS_NODES_STACK_NAME="cktestcluster-nodes"
 EKS_NODE_GROUP_NAME="cktestcluster-eks-nodes"
-EKS_NODE_AS_GROUP_MIN="3"
-EKS_NODE_AS_GROUP_MAX="3"
+EKS_NODE_AS_GROUP_MIN="4"
+EKS_NODE_AS_GROUP_MAX="4"
+EKS_NODE_AS_GROUP_DESIRED="4"
 
 #Amazon instance type - Refer to Amazon Documentation for available values
 EKS_NODE_INSTANCE_TYPE="m4.4xlarge"
