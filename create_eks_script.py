@@ -78,8 +78,8 @@ def replace(file_path, pattern, subst):
 		with open(file_path) as old_file:
 			for line in old_file:
 				new_file.write(line.replace(pattern, subst))
-    	remove(file_path)
-    	move(abs_path, file_path)	
+	remove(file_path)
+	move(abs_path, file_path)	
 
 def insert_lines(file_path, pattern, subst):
 	fh, abs_path = mkstemp()
@@ -90,8 +90,8 @@ def insert_lines(file_path, pattern, subst):
 					for str in subst:
 						new_file.write(str+"\n")
 				new_file.write(line)
-    	remove(file_path)
-    	move(abs_path, file_path)
+	remove(file_path)
+	move(abs_path, file_path)
 
 def usage():
 	global version
