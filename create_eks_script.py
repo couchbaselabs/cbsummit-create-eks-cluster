@@ -146,8 +146,8 @@ def install_eks():
 	if step == 3:
 
 		#Check Desired vs Min and Max
-		if parameters.EKS_NODE_AS_GROUP_DESIRED < parameters.EKS_NODE_AS_GROUP_MIN or \
-			parameters.EKS_NODE_AS_GROUP_DESIRED > parameters.EKS_NODE_AS_GROUP_MAX:
+		if int(parameters.EKS_NODE_AS_GROUP_DESIRED) < int(parameters.EKS_NODE_AS_GROUP_MIN) or \
+			int(parameters.EKS_NODE_AS_GROUP_DESIRED) > int(parameters.EKS_NODE_AS_GROUP_MAX):
 			onError("Autoscaling Group Desired size outside Min/Max",1)
 
 		#Build Worker Node Command
