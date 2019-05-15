@@ -41,8 +41,10 @@ python create_eks_script.py install [start step]
 This will install the EKS cluster starting from an optionally supplied starting step number.  If no starting step number is provided this will start from step 0
 
 ```
-python create_eks_script.py steps|delete|install [start step]
-version: 1.0.0
+python create_eks_script.py steps|delete|install [start step] [--profile aws_profile_name]
+version: 1.0.1
+
+  --profile = Specify the aws profile to use for deployment
 
   Install Steps:
    0. Create VPC

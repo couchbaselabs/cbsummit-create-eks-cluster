@@ -2,22 +2,21 @@ import subprocess
 import parameters
 import sys
 import time
+import os
 from tempfile import mkstemp
 from shutil import move
-from os import fdopen, remove
 
 #=======================================
 #	Constants
 #=======================================
 ns=""
 divider="--------------------------------------"
-version="1.0.0"
+version="1.0.1"
 
 #=======================================
 #	Variables
 #=======================================
 step=0
-delstep=0
 vpc_output=False
 node_output=False
 aws_values={}
@@ -25,6 +24,10 @@ aws_values={}
 #=======================================
 #	Functions
 #=======================================
+def setAwsProfile(profile):
+	os.environ['AWS_DEFAULT_PROFILE']=profile
+	print("AWS_DEFAULT_PROFILE set to : {}".format(os.environ['AWS_DEFAULT_PROFILE']))
+
 def onError(command, retval):
 	print("Error detected:: ")
 	print("command: {}".format(command))
@@ -74,30 +77,32 @@ def get_outputs(command,delimiter):
 
 def replace(file_path, pattern, subst):
 	fh, abs_path = mkstemp()
-	with fdopen(fh,'w') as new_file:
+	with os.fdopen(fh,'w') as new_file:
 		with open(file_path) as old_file:
 			for line in old_file:
 				new_file.write(line.replace(pattern, subst))
-	remove(file_path)
+	os.remove(file_path)
 	move(abs_path, file_path)	
 
 def insert_lines(file_path, pattern, subst):
 	fh, abs_path = mkstemp()
-	with fdopen(fh,'w') as new_file:
+	with os.fdopen(fh,'w') as new_file:
 		with open(file_path) as old_file:
 			for line in old_file:
 				if line.rstrip() == pattern:
 					for str in subst:
 						new_file.write(str+"\n")
 				new_file.write(line)
-	remove(file_path)
+	os.remove(file_path)
 	move(abs_path, file_path)
 
 def usage():
 	global version
 	print("")
-	print("python create_eks_script.py steps|delete|install [start step]")
+	print("python create_eks_script.py steps|delete|install [start step] [--profile aws_profile_name]")
 	print("version: {}".format(version))
+	print("")
+	print("  --profile = Specify the aws profile to use for deployment")
 	print("")
 	print("  Install Steps:")
 	print("   0. Create VPC")
@@ -205,48 +210,78 @@ parameters.EKS_NODE_VOLUME_SIZE, parameters.EKS_NODE_AS_GROUP_DESIRED
 
 
 def delete_eks():
-	global delstep
-	print("Deleting from step {}".format(delstep))
+	global step
+	print("Deleting from step {}".format(step))
 
-	if delstep == 0:
+	if step == 0:
 		execute_command_with_status("aws cloudformation delete-stack --stack-name {} ".format(parameters.EKS_NODES_STACK_NAME), False, \
 		"aws cloudformation describe-stacks --stack-name {} --query Stacks[0].StackStatus 2>&1 | grep -c \"does not exist\"".format(parameters.EKS_NODES_STACK_NAME), \
 		"1")
 
-		delstep=delstep+1
+		step=step+1
 
-	if delstep == 1:
+	if step == 1:
 		execute_command_with_status("aws eks delete-cluster --name {} ".format(parameters.EKS_CLUSTER_NAME), True, \
 		"aws eks describe-cluster --name {0} --query cluster.status 2>&1 | grep -c \"No cluster found\"".format(parameters.EKS_CLUSTER_NAME), \
 		"1")
 
-		delstep=delstep+1
+		step=step+1
 
-	if delstep == 2:
+	if step == 2:
 		execute_command_with_status("aws cloudformation delete-stack --stack-name {} ".format(parameters.VPC_STACK_NAME), False, \
 		"aws cloudformation describe-stacks --stack-name {} --query Stacks[0].StackStatus 2>&1 | grep -c \"does not exist\"".format(parameters.VPC_STACK_NAME), \
 		"1")
 
-		delstep=delstep+1
+		step=step+1
 
 #=======================================
 #	Main Program
 #=======================================
 if __name__ == "__main__":
 
+	#=====================
+	#Parse arguments
+	#=====================
 	if len(sys.argv) < 2:
 		usage()
 
-	if sys.argv[1] == "steps":
+	mode="Unknown"
+	x = 1
+	while x < len(sys.argv):
+		if sys.argv[x] == "steps":
+			usage()
+		elif sys.argv[x] == "install": 
+			if mode == "Unknown":
+				mode="install"
+				x=x+1
+				if x < len(sys.argv) and sys.argv[x].isdigit():
+					step=int(sys.argv[x])
+				else:
+					x=x-1
+		elif sys.argv[x] == "delete": 
+			if mode == "Unknown":
+				mode="delete"
+				x=x+1
+				if x < len(sys.argv) and sys.argv[x].isdigit():
+					step=int(sys.argv[x])
+				else:
+					x=x-1
+		elif sys.argv[x] == "--profile": 
+			x=x+1
+			if x < len(sys.argv):
+				setAwsProfile(sys.argv[x])
+		else:
+			print("Unknown argument: {}".format(sys.argv[x]))
+			usage()
+		x=x+1	
+
+	#==============================================================
+	#Execute the script based on mode determined through arguments
+	#==============================================================
+	if mode == "Unknown":
+		print("No execution mode specified.  Please specify install or delete")
 		usage()
-	elif sys.argv[1] == "install":
-		if len(sys.argv) == 3:
-			step=int(sys.argv[2])
+	elif mode == "install":
 		install_eks()
-	elif sys.argv[1] == "delete":
-		if len(sys.argv) == 3:
-			delstep=int(sys.argv[2])
+	elif mode == "delete":
 		delete_eks()
-	else:
-		print("Unknown argument: {}".format(sys.argv[1]))
-		usage()
