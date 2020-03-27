@@ -61,7 +61,7 @@ def get_password(ids, region, pkey):
 
 def print_instances(ids, file):
     f = open(file, "a")
-    f.write("INSTANCE|PUBLIC IP|PUBLIC DNS|USERNAME|PASSWORD|\n")
+    f.write("INSTANCE|PUBLIC IP|PUBLIC DNS|USERNAME|PASSWORD|ATTENDEE|ATTENDEE EMAIL|\n")
     for key in ids:
         f.write("{0}|{1}|{2}|{3}|{4}|\n".format(key, ids[key]["PublicIpAddress"],
                                                 ids[key]["PublicDnsName"], ids[key]["Username"],
