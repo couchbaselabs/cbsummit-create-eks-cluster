@@ -3,6 +3,7 @@ import parameters
 import sys
 import time
 import os
+import argparse
 from tempfile import mkstemp
 from shutil import move
 
@@ -98,6 +99,14 @@ def usage():
 #        Main Program
 # =======================================
 if __name__ == "__main__":
+
+    # Process any arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--profile", help="Specify the AWS profile to use")
+    args = parser.parse_args()
+
+    if not args.profile is None and len(args.profile) > 0:
+        setAwsProfile(args.profile)
 
     # Prompt and read input
     print("Generating instance report")
