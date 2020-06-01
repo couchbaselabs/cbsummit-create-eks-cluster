@@ -61,12 +61,14 @@ def get_password(ids, region, pkey):
 
 
 def print_instances(ids, file):
+    message = "Your ip is: [{0}]    Your username is: [{1}]    Your password is: {2}"
     f = open(file, "a")
-    f.write("INSTANCE|PUBLIC IP|PUBLIC DNS|USERNAME|PASSWORD|ATTENDEE|ATTENDEE EMAIL|\n")
+    f.write("INSTANCE|PUBLIC IP|PUBLIC DNS|USERNAME|PASSWORD|ATTENDEE|ATTENDEE EMAIL|MESSAGE|\n")
     for key in ids:
-        f.write("{0}|{1}|{2}|{3}|{4}|\n".format(key, ids[key]["PublicIpAddress"],
+	fmt_msg=message.format(ids[key]["PublicIpAddress"],ids[key]["Username"],ids[key]["Password"])
+        f.write("{0}|{1}|{2}|{3}|{4}|||{5}|\n".format(key, ids[key]["PublicIpAddress"],
                                                 ids[key]["PublicDnsName"], ids[key]["Username"],
-                                                ids[key]["Password"]))
+                                                ids[key]["Password"],fmt_msg))
     f.close()
 
 
@@ -145,18 +147,19 @@ if __name__ == "__main__":
         confirm = read_input("Unrecognized input [{}]. Please enter Y/n: ".format(confirm))
 
     # Actual Execution of AWS commands
-    print("")
-    print("Running report")
-    instances = parse_instance_ids(
-        "aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name {0} --region {1} --query {2}".format(
-            scaleGroup, region,
-            "\'AutoScalingGroups[*].Instances[*].InstanceId\'"))
+    if confirm == "Y":
+        print("")
+        print("Running report")
+        instances = parse_instance_ids(
+            "aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name {0} --region {1} --query {2}".format(
+                scaleGroup, region,
+                "\'AutoScalingGroups[*].Instances[*].InstanceId\'"))
 
-    if len(instances) > 1:
-        instances = parse_ip(instances, region)
-        instances = get_password(instances, region, key_path)
-        print_instances(instances, output_file)
-    else:
-        print("Unable to find autoscale group [{}]".format(scaleGroup))
+        if len(instances) >= 1:
+            instances = parse_ip(instances, region)
+            instances = get_password(instances, region, key_path)
+            print_instances(instances, output_file)
+        else:
+            print("Unable to find autoscale group [{}]".format(scaleGroup))
 
-    print("Report completed")
+        print("Report completed")
