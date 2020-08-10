@@ -1,5 +1,6 @@
 ATTEMPTS=10
 WAIT_SEC=120
+DNS="se-couchbasedemos.com"
 
 #===============================
 #	VPC Information
